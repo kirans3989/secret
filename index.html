@@ -28,7 +28,6 @@
       animation: bgMove 12s ease infinite;
       font-family: "Poppins", sans-serif;
       overflow: hidden;
-      position: relative;
     }
 
     @keyframes bgMove {
@@ -37,20 +36,17 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Card */
     .card {
       width: min(92%, 420px);
       padding: 40px 30px 45px;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255,255,255,0.75);
       backdrop-filter: blur(18px);
       border-radius: 28px;
       text-align: center;
-      box-shadow:
-        0 30px 80px rgba(0,0,0,0.25),
-        inset 0 0 0 1px rgba(255,255,255,0.4);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.25);
       position: relative;
-      animation: cardIn 1.1s ease;
       z-index: 10;
+      animation: cardIn 1s ease;
     }
 
     @keyframes cardIn {
@@ -58,29 +54,15 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* Glow ring */
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: 30px;
-      background: linear-gradient(120deg, #ff4d6d, #ff9a9e, #fbc2eb);
-      z-index: -1;
-      filter: blur(20px);
-      opacity: 0.7;
-    }
-
     .emoji {
-      font-size: 68px;
-      margin-bottom: 12px;
+      font-size: 64px;
+      margin-bottom: 10px;
       animation: heartbeat 1.8s infinite;
     }
 
     @keyframes heartbeat {
       0%,100% { transform: scale(1); }
-      25% { transform: scale(1.08); }
-      50% { transform: scale(1); }
-      75% { transform: scale(1.12); }
+      50% { transform: scale(1.1); }
     }
 
     h2 {
@@ -88,61 +70,61 @@
       font-size: 28px;
       color: #4a1c2f;
       margin-bottom: 30px;
-      line-height: 1.35;
+      line-height: 1.3;
     }
 
     .buttons {
       position: relative;
-      height: 78px;
-      margin-bottom: 10px;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 22px;
+      margin-bottom: 12px;
     }
 
     button {
-      position: absolute;
+      position: relative;
       padding: 14px 36px;
       border-radius: 40px;
       border: none;
       font-size: 16px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s ease;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      z-index: 9999;
+      transition: transform 0.15s ease;
       white-space: nowrap;
+      will-change: left, top;
     }
 
     button:active {
-      transform: scale(0.94) !important;
+      transform: scale(0.94);
     }
 
     #yes {
       background: linear-gradient(135deg, #ff4d6d, #ff758f);
       color: #fff;
       box-shadow: 0 15px 35px rgba(255,77,109,0.55);
-      left: 50%;
-      top: 50%;
-      transform: translate(-130%, -50%);
     }
 
     #no {
       background: rgba(255,255,255,0.9);
       color: #777;
-      left: 50%;
-      top: 50%;
-      transform: translate(30%, -50%);
     }
 
     .hint {
-      margin-top: 28px;
+      margin-top: 24px;
       font-size: 13px;
       color: #6b6b6b;
       font-style: italic;
     }
 
-    /* Success message */
+    .hidden {
+      display: none !important;
+    }
+
     .success-message {
       display: none;
-      text-align: center;
       animation: successIn 0.8s ease;
     }
 
@@ -151,13 +133,13 @@
     }
 
     @keyframes successIn {
-      from { opacity: 0; transform: scale(0.8); }
+      from { opacity: 0; transform: scale(0.85); }
       to { opacity: 1; transform: scale(1); }
     }
 
-    .success-message .big-emoji {
-      font-size: 100px;
-      margin-bottom: 20px;
+    .big-emoji {
+      font-size: 90px;
+      margin-bottom: 18px;
       animation: heartbeat 1.5s infinite;
     }
 
@@ -169,43 +151,21 @@
     }
 
     .success-message p {
-      font-size: 18px;
+      font-size: 17px;
       color: #4a1c2f;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    /* Floating depth hearts */
     .heart {
       position: absolute;
       bottom: -20px;
       animation: floatUp linear forwards;
       pointer-events: none;
-      filter: blur(0.3px);
-      z-index: 1;
     }
 
     @keyframes floatUp {
-      from {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(-120vh) scale(1.8);
-        opacity: 0;
-      }
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      h2 { font-size: 23px; }
-      .emoji { font-size: 58px; }
-      button { padding: 12px 28px; font-size: 15px; }
-      .success-message h1 { font-size: 28px; }
-      .success-message .big-emoji { font-size: 80px; }
+      from { transform: translateY(0) scale(1); opacity: 1; }
+      to { transform: translateY(-120vh) scale(1.6); opacity: 0; }
     }
   </style>
 </head>
@@ -222,16 +182,17 @@
         <button id="no">No 🙈</button>
       </div>
 
-      <div class="hint">Try to catch them if you can! ✨</div>
+      <div class="hint">Try to catch them if you can ✨</div>
     </div>
 
     <div id="successSection" class="success-message">
       <div class="big-emoji">💕</div>
       <h1>YAY! 🎉</h1>
-      <p>You make my heart skip a beat every single day! 💓</p>
-      <p style="font-size: 16px; margin-top: 15px;">Being with you feels like a dream come true ✨</p>
-      <p style="font-size: 16px; margin-top: 10px;">I can't wait to create more beautiful memories together! 🥰</p>
-      <p style="font-size: 14px; margin-top: 15px; color: #ff4d6d; font-style: italic; font-weight: bold;">You're my favorite person in the whole world 🌎💖</p>
+      <p>You make my heart skip a beat every single day 💓</p>
+      <p>Being with you feels like a dream come true ✨</p>
+      <p style="margin-top: 12px; font-style: italic; color: #ff4d6d;">
+        You’re my favorite person in the whole world 🌎💖
+      </p>
     </div>
   </div>
 
@@ -240,121 +201,73 @@
   <audio id="yesSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
 
   <script>
-    // Wait for page to fully load
-    window.addEventListener('load', function() {
-      const noBtn = document.getElementById("no");
+    window.addEventListener("load", () => {
       const yesBtn = document.getElementById("yes");
-      const questionSection = document.getElementById("questionSection");
-      const successSection = document.getElementById("successSection");
+      const noBtn = document.getElementById("no");
+      const buttons = document.querySelector(".buttons");
+      const question = document.getElementById("questionSection");
+      const success = document.getElementById("successSection");
       const hoverSound = document.getElementById("hoverSound");
       const yesSound = document.getElementById("yesSound");
-      const buttonsContainer = document.querySelector('.buttons');
 
-      let hasMoved = false;
+      let yesMoves = 0;
+      const MAX_YES_MOVES = 5;
 
-      // Function to play sound safely
-      function playSound(audio) {
-        try {
-          audio.currentTime = 0;
-          audio.play().catch(err => console.log('Sound play failed:', err));
-        } catch (e) {
-          console.log('Sound error:', e);
-        }
+      function play(audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
       }
 
-      // Function to move button to random position within the button container area
-      function moveButtonInContainer(button) {
-        if (!hasMoved) {
-          // First move: switch to absolute positioning
-          button.style.position = 'absolute';
-          hasMoved = true;
-        }
+      function move(button) {
+        const maxX = buttons.clientWidth - button.offsetWidth;
+        const maxY = buttons.clientHeight - button.offsetHeight;
 
-        const container = buttonsContainer.getBoundingClientRect();
-        const buttonRect = button.getBoundingClientRect();
-        
-        // Calculate safe boundaries within the container
-        const maxLeft = container.width - buttonRect.width;
-        const maxTop = container.height - buttonRect.height;
-        
-        // Generate random position within safe boundaries
-        const randomLeft = Math.max(0, Math.min(maxLeft, Math.random() * maxLeft));
-        const randomTop = Math.max(0, Math.min(maxTop, Math.random() * maxTop));
-        
-        button.style.left = randomLeft + 'px';
-        button.style.top = randomTop + 'px';
-        button.style.transform = 'none';
+        button.style.position = "absolute";
+        button.style.left = Math.random() * maxX + "px";
+        button.style.top = Math.random() * maxY + "px";
       }
 
-      // Move YES button when mouse enters
       yesBtn.addEventListener("mouseenter", () => {
-        playSound(hoverSound);
-        moveButtonInContainer(yesBtn);
+        if (yesMoves >= MAX_YES_MOVES) return;
+        play(hoverSound);
+        move(yesBtn);
+        yesMoves++;
+
+        if (yesMoves === MAX_YES_MOVES) {
+          yesBtn.style.position = "relative";
+          yesBtn.style.left = "auto";
+          yesBtn.style.top = "auto";
+        }
       });
 
-      // Move NO button when mouse enters  
       noBtn.addEventListener("mouseenter", () => {
-        playSound(hoverSound);
-        moveButtonInContainer(noBtn);
+        play(hoverSound);
+        move(noBtn);
       });
 
-      // When YES is clicked
-      yesBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        playSound(yesSound);
+      yesBtn.addEventListener("click", () => {
+        play(yesSound);
+        question.classList.add("hidden");
+        success.classList.add("show");
 
-        // Hide buttons
-        yesBtn.classList.add("hidden");
-        noBtn.classList.add("hidden");
-
-        // Show success message
-        questionSection.classList.add("hidden");
-        successSection.classList.add("show");
-
-        // Confetti celebration
-        if (typeof confetti !== 'undefined') {
-          confetti({
-            particleCount: 260,
-            spread: 120,
-            origin: { y: 0.65 }
-          });
-
-          // More confetti after delay
+        if (window.confetti) {
+          confetti({ particleCount: 250, spread: 120, origin: { y: 0.65 } });
           setTimeout(() => {
-            confetti({
-              particleCount: 150,
-              spread: 100,
-              origin: { y: 0.6 }
-            });
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
           }, 400);
         }
       });
 
-      // When NO is clicked (also moves both buttons away)
-      noBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        playSound(hoverSound);
-        moveButtonInContainer(noBtn);
-        moveButtonInContainer(yesBtn);
-      });
-
-      // Create floating hearts
-      function createHeart() {
+      setInterval(() => {
         const heart = document.createElement("div");
         heart.className = "heart";
         heart.innerHTML = Math.random() > 0.5 ? "❤️" : "💗";
         heart.style.left = Math.random() * 100 + "vw";
-        heart.style.fontSize = Math.random() * 22 + 14 + "px";
+        heart.style.fontSize = Math.random() * 18 + 14 + "px";
         heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-        heart.style.opacity = Math.random() * 0.5 + 0.4;
-
         document.body.appendChild(heart);
         setTimeout(() => heart.remove(), 8000);
-      }
-
-      setInterval(createHeart, 380);
+      }, 400);
     });
   </script>
 
