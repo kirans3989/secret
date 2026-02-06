@@ -23,34 +23,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
-      background-size: 400% 400%;
-      animation: bgMove 12s ease infinite;
+      background: linear-gradient(
+        135deg,
+        #fde2e4,
+        #f8cdda
+      );
       font-family: "Poppins", sans-serif;
       overflow: hidden;
-    }
-
-    @keyframes bgMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
 
     .card {
       width: min(92%, 420px);
       padding: 40px 30px 45px;
-      background: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.85);
       backdrop-filter: blur(18px);
       border-radius: 28px;
       text-align: center;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.2);
       position: relative;
-      z-index: 10;
-      animation: cardIn 1s ease;
+      animation: cardIn 0.9s ease;
     }
 
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      from { opacity: 0; transform: translateY(25px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
@@ -62,7 +57,7 @@
 
     @keyframes heartbeat {
       0%,100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.12); }
     }
 
     h2 {
@@ -92,7 +87,7 @@
       font-weight: 500;
       cursor: pointer;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      transition: transform 0.15s ease;
+      transition: transform 0.12s ease;
       white-space: nowrap;
       will-change: left, top;
     }
@@ -104,11 +99,11 @@
     #yes {
       background: linear-gradient(135deg, #ff4d6d, #ff758f);
       color: #fff;
-      box-shadow: 0 15px 35px rgba(255,77,109,0.55);
+      box-shadow: 0 15px 35px rgba(255,77,109,0.45);
     }
 
     #no {
-      background: rgba(255,255,255,0.9);
+      background: #fff;
       color: #777;
     }
 
@@ -125,7 +120,7 @@
 
     .success-message {
       display: none;
-      animation: successIn 0.8s ease;
+      animation: successIn 0.7s ease;
     }
 
     .success-message.show {
@@ -211,7 +206,8 @@
       const yesSound = document.getElementById("yesSound");
 
       let yesMoves = 0;
-      const MAX_YES_MOVES = 5;
+      const MAX_YES_MOVES = 10;
+      let lastMoveTime = 0;
 
       function play(audio) {
         audio.currentTime = 0;
@@ -227,8 +223,12 @@
         button.style.top = Math.random() * maxY + "px";
       }
 
-      yesBtn.addEventListener("mouseenter", () => {
+      function tryMoveYes() {
+        const now = Date.now();
         if (yesMoves >= MAX_YES_MOVES) return;
+        if (now - lastMoveTime < 120) return; // faster but controlled
+
+        lastMoveTime = now;
         play(hoverSound);
         move(yesBtn);
         yesMoves++;
@@ -238,7 +238,10 @@
           yesBtn.style.left = "auto";
           yesBtn.style.top = "auto";
         }
-      });
+      }
+
+      yesBtn.addEventListener("mouseenter", tryMoveYes);
+      yesBtn.addEventListener("mousemove", tryMoveYes);
 
       noBtn.addEventListener("mouseenter", () => {
         play(hoverSound);
@@ -267,7 +270,7 @@
         heart.style.animationDuration = Math.random() * 3 + 4 + "s";
         document.body.appendChild(heart);
         setTimeout(() => heart.remove(), 8000);
-      }, 400);
+      }, 420);
     });
   </script>
 
