@@ -98,7 +98,7 @@
     }
 
     button {
-      position: fixed;
+      position: absolute;
       padding: 14px 36px;
       border-radius: 40px;
       border: none;
@@ -108,22 +108,28 @@
       transition: all 0.15s ease;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       z-index: 9999;
-      transform: translate(0, 0);
+      white-space: nowrap;
     }
 
     button:active {
-      transform: scale(0.94);
+      transform: scale(0.94) !important;
     }
 
     #yes {
       background: linear-gradient(135deg, #ff4d6d, #ff758f);
       color: #fff;
       box-shadow: 0 15px 35px rgba(255,77,109,0.55);
+      left: 50%;
+      top: 50%;
+      transform: translate(-130%, -50%);
     }
 
     #no {
       background: rgba(255,255,255,0.9);
       color: #777;
+      left: 50%;
+      top: 50%;
+      transform: translate(30%, -50%);
     }
 
     .hint {
@@ -242,8 +248,9 @@
       const successSection = document.getElementById("successSection");
       const hoverSound = document.getElementById("hoverSound");
       const yesSound = document.getElementById("yesSound");
+      const buttonsContainer = document.querySelector('.buttons');
 
-      let isButtonsInitialized = false;
+      let hasMoved = false;
 
       // Function to play sound safely
       function playSound(audio) {
@@ -255,66 +262,40 @@
         }
       }
 
-      // Function to get button dimensions
-      function getButtonDimensions(button) {
-        const rect = button.getBoundingClientRect();
-        return {
-          width: rect.width,
-          height: rect.height
-        };
-      }
+      // Function to move button to random position within the button container area
+      function moveButtonInContainer(button) {
+        if (!hasMoved) {
+          // First move: switch to absolute positioning
+          button.style.position = 'absolute';
+          hasMoved = true;
+        }
 
-      // Function to move button to random position on entire webpage
-      function moveButton(button) {
-        const dims = getButtonDimensions(button);
-        const padding = 20; // Safe padding from edges
+        const container = buttonsContainer.getBoundingClientRect();
+        const buttonRect = button.getBoundingClientRect();
         
-        const maxX = window.innerWidth - dims.width - padding;
-        const maxY = window.innerHeight - dims.height - padding;
-
-        const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-        const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-
-        button.style.left = randomX + "px";
-        button.style.top = randomY + "px";
-      }
-
-      // Initial positioning of buttons in center
-      function initializeButtons() {
-        if (isButtonsInitialized) return;
+        // Calculate safe boundaries within the container
+        const maxLeft = container.width - buttonRect.width;
+        const maxTop = container.height - buttonRect.height;
         
-        setTimeout(() => {
-          const yesDims = getButtonDimensions(yesBtn);
-          const noDims = getButtonDimensions(noBtn);
-          
-          const centerX = window.innerWidth / 2;
-          const centerY = window.innerHeight / 2;
-          
-          // Position Yes button to the left of center
-          yesBtn.style.left = (centerX - 160) + "px";
-          yesBtn.style.top = (centerY + 20) + "px";
-          
-          // Position No button to the right of center
-          noBtn.style.left = (centerX + 40) + "px";
-          noBtn.style.top = (centerY + 20) + "px";
-          
-          isButtonsInitialized = true;
-        }, 100);
+        // Generate random position within safe boundaries
+        const randomLeft = Math.max(0, Math.min(maxLeft, Math.random() * maxLeft));
+        const randomTop = Math.max(0, Math.min(maxTop, Math.random() * maxTop));
+        
+        button.style.left = randomLeft + 'px';
+        button.style.top = randomTop + 'px';
+        button.style.transform = 'none';
       }
-
-      // Initialize button positions
-      initializeButtons();
 
       // Move YES button when mouse enters
       yesBtn.addEventListener("mouseenter", () => {
         playSound(hoverSound);
-        moveButton(yesBtn);
+        moveButtonInContainer(yesBtn);
       });
 
-      // Move NO button when mouse enters
+      // Move NO button when mouse enters  
       noBtn.addEventListener("mouseenter", () => {
         playSound(hoverSound);
-        moveButton(noBtn);
+        moveButtonInContainer(noBtn);
       });
 
       // When YES is clicked
@@ -355,8 +336,8 @@
         e.preventDefault();
         e.stopPropagation();
         playSound(hoverSound);
-        moveButton(noBtn);
-        moveButton(yesBtn);
+        moveButtonInContainer(noBtn);
+        moveButtonInContainer(yesBtn);
       });
 
       // Create floating hearts
@@ -374,14 +355,6 @@
       }
 
       setInterval(createHeart, 380);
-
-      // Reposition buttons on window resize
-      window.addEventListener("resize", () => {
-        if (!yesBtn.classList.contains("hidden")) {
-          isButtonsInitialized = false;
-          initializeButtons();
-        }
-      });
     });
   </script>
 
