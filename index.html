@@ -28,6 +28,7 @@
       animation: bgMove 12s ease infinite;
       font-family: "Poppins", sans-serif;
       overflow: hidden;
+      position: relative;
     }
 
     @keyframes bgMove {
@@ -49,6 +50,7 @@
         inset 0 0 0 1px rgba(255,255,255,0.4);
       position: relative;
       animation: cardIn 1.1s ease;
+      z-index: 10;
     }
 
     @keyframes cardIn {
@@ -103,9 +105,10 @@
       font-size: 16px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.15s ease;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      z-index: 1000;
+      z-index: 9999;
+      transform: translate(0, 0);
     }
 
     button:active {
@@ -116,11 +119,6 @@
       background: linear-gradient(135deg, #ff4d6d, #ff758f);
       color: #fff;
       box-shadow: 0 15px 35px rgba(255,77,109,0.55);
-    }
-
-    #yes:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 20px 40px rgba(255,77,109,0.7);
     }
 
     #no {
@@ -177,6 +175,7 @@
       animation: floatUp linear forwards;
       pointer-events: none;
       filter: blur(0.3px);
+      z-index: 1;
     }
 
     @keyframes floatUp {
@@ -191,7 +190,7 @@
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     /* Responsive */
@@ -235,112 +234,154 @@
   <audio id="yesSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
 
   <script>
-    const noBtn = document.getElementById("no");
-    const yesBtn = document.getElementById("yes");
-    const questionSection = document.getElementById("questionSection");
-    const successSection = document.getElementById("successSection");
-    const hoverSound = document.getElementById("hoverSound");
-    const yesSound = document.getElementById("yesSound");
+    // Wait for page to fully load
+    window.addEventListener('load', function() {
+      const noBtn = document.getElementById("no");
+      const yesBtn = document.getElementById("yes");
+      const questionSection = document.getElementById("questionSection");
+      const successSection = document.getElementById("successSection");
+      const hoverSound = document.getElementById("hoverSound");
+      const yesSound = document.getElementById("yesSound");
 
-    // Function to move button to random position on entire webpage
-    function moveButton(button) {
-      const maxX = window.innerWidth - button.offsetWidth - 20;
-      const maxY = window.innerHeight - button.offsetHeight - 20;
+      let isButtonsInitialized = false;
 
-      const randomX = Math.max(10, Math.random() * maxX);
-      const randomY = Math.max(10, Math.random() * maxY);
+      // Function to play sound safely
+      function playSound(audio) {
+        try {
+          audio.currentTime = 0;
+          audio.play().catch(err => console.log('Sound play failed:', err));
+        } catch (e) {
+          console.log('Sound error:', e);
+        }
+      }
 
-      button.style.left = randomX + "px";
-      button.style.top = randomY + "px";
-    }
+      // Function to get button dimensions
+      function getButtonDimensions(button) {
+        const rect = button.getBoundingClientRect();
+        return {
+          width: rect.width,
+          height: rect.height
+        };
+      }
 
-    // Initial positioning of buttons
-    function initializeButtons() {
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      
-      yesBtn.style.left = (centerX - 150) + "px";
-      yesBtn.style.top = (centerY + 20) + "px";
-      
-      noBtn.style.left = (centerX + 50) + "px";
-      noBtn.style.top = (centerY + 20) + "px";
-    }
+      // Function to move button to random position on entire webpage
+      function moveButton(button) {
+        const dims = getButtonDimensions(button);
+        const padding = 20; // Safe padding from edges
+        
+        const maxX = window.innerWidth - dims.width - padding;
+        const maxY = window.innerHeight - dims.height - padding;
 
-    initializeButtons();
+        const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+        const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
 
-    // Move YES button when mouse enters
-    yesBtn.addEventListener("mouseenter", () => {
-      hoverSound.currentTime = 0;
-      hoverSound.play();
-      moveButton(yesBtn);
-    });
+        button.style.left = randomX + "px";
+        button.style.top = randomY + "px";
+      }
 
-    // Move NO button when mouse enters
-    noBtn.addEventListener("mouseenter", () => {
-      hoverSound.currentTime = 0;
-      hoverSound.play();
-      moveButton(noBtn);
-    });
+      // Initial positioning of buttons in center
+      function initializeButtons() {
+        if (isButtonsInitialized) return;
+        
+        setTimeout(() => {
+          const yesDims = getButtonDimensions(yesBtn);
+          const noDims = getButtonDimensions(noBtn);
+          
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          
+          // Position Yes button to the left of center
+          yesBtn.style.left = (centerX - 160) + "px";
+          yesBtn.style.top = (centerY + 20) + "px";
+          
+          // Position No button to the right of center
+          noBtn.style.left = (centerX + 40) + "px";
+          noBtn.style.top = (centerY + 20) + "px";
+          
+          isButtonsInitialized = true;
+        }, 100);
+      }
 
-    // When YES is clicked
-    yesBtn.addEventListener("click", () => {
-      yesSound.play();
+      // Initialize button positions
+      initializeButtons();
 
-      // Hide buttons
-      yesBtn.classList.add("hidden");
-      noBtn.classList.add("hidden");
-
-      // Show success message
-      questionSection.classList.add("hidden");
-      successSection.classList.add("show");
-
-      // Confetti celebration
-      confetti({
-        particleCount: 260,
-        spread: 120,
-        origin: { y: 0.65 }
+      // Move YES button when mouse enters
+      yesBtn.addEventListener("mouseenter", () => {
+        playSound(hoverSound);
+        moveButton(yesBtn);
       });
 
-      // More confetti after delay
-      setTimeout(() => {
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.6 }
-        });
-      }, 400);
-    });
-
-    // When NO is clicked (also moves away)
-    noBtn.addEventListener("click", () => {
-      hoverSound.currentTime = 0;
-      hoverSound.play();
-      moveButton(noBtn);
-      moveButton(yesBtn);
-    });
-
-    // Create floating hearts
-    function createHeart() {
-      const heart = document.createElement("div");
-      heart.className = "heart";
-      heart.innerHTML = Math.random() > 0.5 ? "❤️" : "💗";
-      heart.style.left = Math.random() * 100 + "vw";
-      heart.style.fontSize = Math.random() * 22 + 14 + "px";
-      heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-      heart.style.opacity = Math.random() * 0.5 + 0.4;
-
-      document.body.appendChild(heart);
-      setTimeout(() => heart.remove(), 8000);
-    }
-
-    setInterval(createHeart, 380);
-
-    // Reposition buttons on window resize
-    window.addEventListener("resize", () => {
-      if (!yesBtn.classList.contains("hidden")) {
-        moveButton(yesBtn);
+      // Move NO button when mouse enters
+      noBtn.addEventListener("mouseenter", () => {
+        playSound(hoverSound);
         moveButton(noBtn);
+      });
+
+      // When YES is clicked
+      yesBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        playSound(yesSound);
+
+        // Hide buttons
+        yesBtn.classList.add("hidden");
+        noBtn.classList.add("hidden");
+
+        // Show success message
+        questionSection.classList.add("hidden");
+        successSection.classList.add("show");
+
+        // Confetti celebration
+        if (typeof confetti !== 'undefined') {
+          confetti({
+            particleCount: 260,
+            spread: 120,
+            origin: { y: 0.65 }
+          });
+
+          // More confetti after delay
+          setTimeout(() => {
+            confetti({
+              particleCount: 150,
+              spread: 100,
+              origin: { y: 0.6 }
+            });
+          }, 400);
+        }
+      });
+
+      // When NO is clicked (also moves both buttons away)
+      noBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        playSound(hoverSound);
+        moveButton(noBtn);
+        moveButton(yesBtn);
+      });
+
+      // Create floating hearts
+      function createHeart() {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.innerHTML = Math.random() > 0.5 ? "❤️" : "💗";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = Math.random() * 22 + 14 + "px";
+        heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+        heart.style.opacity = Math.random() * 0.5 + 0.4;
+
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 8000);
       }
+
+      setInterval(createHeart, 380);
+
+      // Reposition buttons on window resize
+      window.addEventListener("resize", () => {
+        if (!yesBtn.classList.contains("hidden")) {
+          isButtonsInitialized = false;
+          initializeButtons();
+        }
+      });
     });
   </script>
 
