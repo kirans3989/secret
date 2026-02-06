@@ -92,10 +92,11 @@
     .buttons {
       position: relative;
       height: 78px;
+      margin-bottom: 10px;
     }
 
     button {
-      position: absolute;
+      position: fixed;
       padding: 14px 36px;
       border-radius: 40px;
       border: none;
@@ -104,6 +105,7 @@
       cursor: pointer;
       transition: all 0.25s ease;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      z-index: 1000;
     }
 
     button:active {
@@ -111,7 +113,6 @@
     }
 
     #yes {
-      left: 12%;
       background: linear-gradient(135deg, #ff4d6d, #ff758f);
       color: #fff;
       box-shadow: 0 15px 35px rgba(255,77,109,0.55);
@@ -123,7 +124,6 @@
     }
 
     #no {
-      left: 55%;
       background: rgba(255,255,255,0.9);
       color: #777;
     }
@@ -133,6 +133,41 @@
       font-size: 13px;
       color: #6b6b6b;
       font-style: italic;
+    }
+
+    /* Success message */
+    .success-message {
+      display: none;
+      text-align: center;
+      animation: successIn 0.8s ease;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @keyframes successIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .success-message .big-emoji {
+      font-size: 100px;
+      margin-bottom: 20px;
+      animation: heartbeat 1.5s infinite;
+    }
+
+    .success-message h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 36px;
+      color: #ff4d6d;
+      margin-bottom: 15px;
+    }
+
+    .success-message p {
+      font-size: 18px;
+      color: #4a1c2f;
+      margin-bottom: 10px;
     }
 
     /* Floating depth hearts */
@@ -155,13 +190,17 @@
       }
     }
 
+    .hidden {
+      display: none;
+    }
+
     /* Responsive */
     @media (max-width: 480px) {
       h2 { font-size: 23px; }
       .emoji { font-size: 58px; }
       button { padding: 12px 28px; font-size: 15px; }
-      #yes { left: 8%; }
-      #no { left: 55%; }
+      .success-message h1 { font-size: 28px; }
+      .success-message .big-emoji { font-size: 80px; }
     }
   </style>
 </head>
@@ -169,15 +208,26 @@
 <body>
 
   <div class="card">
-    <div class="emoji">🐱❤️</div>
-    <h2>Sweety,<br>will you be my Valentine?</h2>
+    <div id="questionSection">
+      <div class="emoji">🐱❤️</div>
+      <h2>Sweety,<br>will you be my Valentine?</h2>
 
-    <div class="buttons">
-      <button id="yes">Yes 💖</button>
-      <button id="no">No 🙈</button>
+      <div class="buttons">
+        <button id="yes">Yes 💖</button>
+        <button id="no">No 🙈</button>
+      </div>
+
+      <div class="hint">Try to catch them if you can! ✨</div>
     </div>
 
-    <div class="hint">Some love stories don’t allow “no” ✨</div>
+    <div id="successSection" class="success-message">
+      <div class="big-emoji">💕</div>
+      <h1>YAY! 🎉</h1>
+      <p>You make my heart skip a beat every single day! 💓</p>
+      <p style="font-size: 16px; margin-top: 15px;">Being with you feels like a dream come true ✨</p>
+      <p style="font-size: 16px; margin-top: 10px;">I can't wait to create more beautiful memories together! 🥰</p>
+      <p style="font-size: 14px; margin-top: 15px; color: #ff4d6d; font-style: italic; font-weight: bold;">You're my favorite person in the whole world 🌎💖</p>
+    </div>
   </div>
 
   <!-- Sounds -->
@@ -187,38 +237,89 @@
   <script>
     const noBtn = document.getElementById("no");
     const yesBtn = document.getElementById("yes");
-    const card = document.querySelector(".card");
+    const questionSection = document.getElementById("questionSection");
+    const successSection = document.getElementById("successSection");
     const hoverSound = document.getElementById("hoverSound");
     const yesSound = document.getElementById("yesSound");
 
+    // Function to move button to random position on entire webpage
+    function moveButton(button) {
+      const maxX = window.innerWidth - button.offsetWidth - 20;
+      const maxY = window.innerHeight - button.offsetHeight - 20;
+
+      const randomX = Math.max(10, Math.random() * maxX);
+      const randomY = Math.max(10, Math.random() * maxY);
+
+      button.style.left = randomX + "px";
+      button.style.top = randomY + "px";
+    }
+
+    // Initial positioning of buttons
+    function initializeButtons() {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      
+      yesBtn.style.left = (centerX - 150) + "px";
+      yesBtn.style.top = (centerY + 20) + "px";
+      
+      noBtn.style.left = (centerX + 50) + "px";
+      noBtn.style.top = (centerY + 20) + "px";
+    }
+
+    initializeButtons();
+
+    // Move YES button when mouse enters
+    yesBtn.addEventListener("mouseenter", () => {
+      hoverSound.currentTime = 0;
+      hoverSound.play();
+      moveButton(yesBtn);
+    });
+
+    // Move NO button when mouse enters
     noBtn.addEventListener("mouseenter", () => {
       hoverSound.currentTime = 0;
       hoverSound.play();
-
-      const cardRect = card.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
-
-      const maxX = cardRect.width - btnRect.width - 10;
-      const maxY = cardRect.height - btnRect.height - 10;
-
-      noBtn.style.left = Math.random() * maxX + "px";
-      noBtn.style.top = Math.random() * maxY + "px";
+      moveButton(noBtn);
     });
 
+    // When YES is clicked
     yesBtn.addEventListener("click", () => {
       yesSound.play();
 
+      // Hide buttons
+      yesBtn.classList.add("hidden");
+      noBtn.classList.add("hidden");
+
+      // Show success message
+      questionSection.classList.add("hidden");
+      successSection.classList.add("show");
+
+      // Confetti celebration
       confetti({
         particleCount: 260,
         spread: 120,
         origin: { y: 0.65 }
       });
 
+      // More confetti after delay
       setTimeout(() => {
-        alert("YAY 💕 I can’t wait for Valentine’s Day with you!");
-      }, 500);
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 }
+        });
+      }, 400);
     });
 
+    // When NO is clicked (also moves away)
+    noBtn.addEventListener("click", () => {
+      hoverSound.currentTime = 0;
+      hoverSound.play();
+      moveButton(noBtn);
+      moveButton(yesBtn);
+    });
+
+    // Create floating hearts
     function createHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
@@ -233,6 +334,14 @@
     }
 
     setInterval(createHeart, 380);
+
+    // Reposition buttons on window resize
+    window.addEventListener("resize", () => {
+      if (!yesBtn.classList.contains("hidden")) {
+        moveButton(yesBtn);
+        moveButton(noBtn);
+      }
+    });
   </script>
 
 </body>
